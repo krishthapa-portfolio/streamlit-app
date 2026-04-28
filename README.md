@@ -1,27 +1,26 @@
-# DAYCRAFT. Daily Routine Productivity System  
-Naw Mahkaw, Krish Thapa, Phuc Thai Le  
-DTSC 4050, Spring 2026  
+## 📌 What It Does  
+
+DayCraft is a personalized daily routine system that generates adaptive schedules based on a user’s:
+
+- Role (Student, Student-Athlete, Working Adult)
+- Sleep duration
+- Energy level
+- Stress level
+- Post-activity feedback (after class/work/practice)
+
+Unlike a static planner, DayCraft continuously adjusts the rest of the day after checking in with how the user actually feels after their main activity.
 
 ---
 
-## Live App  
-https://app-app-nicz5xxvvdfvxns6prxonj.streamlit.app/
+## 🧠 Core Recommendation Logic (Colab Prototype)
 
----
+This is the original backend logic built in Google Colab before being moved into Streamlit.
 
-## What It Does  
-
-DayCraft takes in your role, sleep hours, energy, stress level, and schedule for the day. Then it generates a personalized routine based on all of that. The difference from a regular to-do app is that it doesn't just give you a plan at the start and leave it. It asks how you actually feel after your main activity (classes, practice, or work) and adjusts the rest of your day based on that answer.
-
-Three roles are supported: Student, Student-Athlete, and Working Adult. Each one has different inputs, different historical data, and different recommendation logic.
-
----
-
-## How We Built It  
-
-We built the whole thing in Google Colab first as a terminal program. All the logic, DataFrames, and recommendation rules were written there before any Streamlit code existed.
-
-The core of the Colab version looks like this:
+It uses:
+- Role-based historical data
+- Simple statistical analysis
+- Rule-based decision making
+- Post-activity feedback loops
 
 ```python
 # Historical data stored as Pandas DataFrames, one per role
@@ -53,7 +52,7 @@ else:
         "Longer sessions are effective for complex subjects and assignments."
     ))
 
-# Post-activity check-in. User types their stress/energy after classes or work.
+# Post-activity check-in. User types stress/energy after classes or work.
 post_stress = int(input("Stress level after classes (1-5): "))
 post_energy = int(input("Energy level after classes (1-5): "))
 
@@ -61,45 +60,64 @@ if post_stress >= 4 or post_energy <= 2:
     print(explain_task("Recovery + Light Study", ...))
 else:
     print(explain_task("Study / Gym / Productive Work", ...))
-Streamlit Conversion Notes
+🔄 How It Was Built
 
-Nothing changed:
+We first built the system entirely in Google Colab as a terminal-based program.
 
-All three DataFrames (student, athlete, adult history)
-Every if/elif recommendation rule
-The avg_stress calculation and insight logic
-The explain_task function logic
+That version handled:
 
-What changed:
+All logic and decision rules
+DataFrames for each role
+Recommendation engine
+Stress and energy-based adaptation
 
-input() calls became st.slider(), st.number_input(), and st.radio()
-print() calls became st.expander() and st.info()
-explain_task() now returns a dictionary instead of a string so each piece (task, reason, context) can go into its own part of the UI card
-We added st.session_state to handle the two-phase flow
-Session State Explanation
+After validating the logic, we migrated everything into Streamlit for a user interface.
 
-The session state part was the biggest structural change.
+🌐 Streamlit Conversion
+What Stayed the Same
+All Pandas DataFrames (role-based history)
+All if/elif recommendation logic
+avg_stress calculation
+explain_task function logic
+What Changed
+input() → st.slider(), st.radio(), st.number_input()
+print() → st.info(), st.expander()
+String output → structured UI components
+Added st.session_state for multi-step interaction flow
+🧩 Session State Explanation
 
-In Colab, input() pauses execution and waits.
+The biggest structural change was adapting to Streamlit’s rerun system.
 
-Streamlit doesn't do that because it reruns the entire script every time a user interacts with anything.
+In Colab:
 
-So we used:
+input() pauses execution until user responds
+
+In Streamlit:
+
+The entire script reruns every interaction
+
+To handle this, we used:
 
 st.session_state to store user inputs
-a phase variable to track whether the app is in input mode or recommendation mode
-On AI Use
+A phase variable to control app flow (input phase → recommendation phase)
 
-The recommendation logic, DataFrames, and if/elif rules were written by us in Colab.
+This allows the app to behave like a step-by-step system instead of resetting every interaction.
 
-We used AI to help with Streamlit-specific syntax like session state and structuring the two-phase flow since we hadn't used Streamlit before.
+🤖 On AI Use
+AI was used to assist with Streamlit syntax (especially session state and UI structure)
+All core logic (recommendation system, rules, DataFrames, decision flow) was designed and written by us in Colab
+The final system logic is identical between Colab and app.py
 
-The underlying system (what gets recommended and why) was not generated by AI.
+You can verify this by comparing both versions directly.
 
-You can confirm this by comparing the Colab snippet above to the app.py file. The logic is identical.
-
-Run It Locally
+▶️ Run Locally
 pip install streamlit pandas
 streamlit run app.py
 
-Or just open the live link, no setup needed.
+Or simply use the live link above — no setup required.
+
+## Run It Locally  
+
+```bash
+pip install streamlit pandas
+streamlit run app.py
